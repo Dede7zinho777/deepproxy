@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# Instalar dependências do sistema (APENAS PACOTES QUE EXISTEM NO DEBIAN)
+# Instalar dependências do sistema (SEM pacotes t64)
 RUN apt-get update && apt-get install -y \
     wget gnupg curl \
     libx11-xcb1 libxrandr2 libxcomposite1 libxcursor1 libxdamage1 \
@@ -12,17 +12,26 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Copiar e instalar dependências
 COPY package*.json ./
 RUN npm install
 RUN npm install --save-dev @types/node tsx
 
-# Instalar Playwright e Chromium
+# Instalar Playwright
 RUN npx playwright install chromium
 
+# Copiar o código
 COPY . .
 
+# Compilar TypeScript
+RUN npm run build
+
+# Configurar variáveis de ambiente
 ENV PORT=3000
 ENV NODE_ENV=production
+
+# Expor a porta
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx tsx src/index.ts"]
+# Rodar o servidor
+CMD ["node", "dist/index.js"]
