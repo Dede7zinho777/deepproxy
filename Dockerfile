@@ -21,9 +21,6 @@ RUN npm install --save-dev @types/node tsx
 # Copiar o código
 COPY . .
 
-# Remover arquivos de teste problemáticos (se existirem)
-RUN rm -f src/*.test.ts
-
 # Rodar com tsx (sem compilar)
 EXPOSE 3000
 
