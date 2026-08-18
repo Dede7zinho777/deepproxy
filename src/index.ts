@@ -1,20 +1,10 @@
-/*
- * File: index.ts
- * Project: deepsproxy
- * Author: Pedro Farias
- * Created: 2026-05-09
- * 
- * Last Modified: Sat May 09 2026
- * Modified By: Pedro Farias
- */
-
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { chatCompletions } from './routes/chat.ts';
+import { chatCompletions } from './routes/chat.js';
 import * as dotenv from 'dotenv';
-import { initPlaywright } from './services/playwright.ts';
-import { getContextLength } from './services/telemetry.ts';
+import { initPlaywright } from './services/playwright.js';
+import { getContextLength } from './services/telemetry.js';
 
 dotenv.config();
 
@@ -33,7 +23,7 @@ function modelEntry(id: string) {
     context_length: dynamicLimit,
     max_context_tokens: dynamicLimit,
     max_input_tokens: dynamicLimit,
-    max_output_tokens: 8_000,
+    max_output_tokens: 8000,
   };
 }
 
@@ -70,21 +60,18 @@ app.get('/v1/models', (c) => {
   });
 });
 
-// Initialize playwright when server starts
-import { fileURLToPath } from 'url';
+// Inicializar Playwright e iniciar servidor
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  initPlaywright().then(() => {
-    console.log('Playwright initialized.');
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-    console.log(`Server is running on port ${port}`);
+initPlaywright().then(() => {
+  console.log('Playwright initialized.');
+  console.log(`Server is running on port ${port}`);
 
-    serve({
-      fetch: app.fetch,
-      port
-    });
-  }).catch((err: any) => {
-    console.error('Failed to initialize playwright:', err);
-    process.exit(1);
+  serve({
+    fetch: app.fetch,
+    port
   });
-}
+}).catch((err: any) => {
+  console.error('Failed to initialize playwright:', err);
+  process.exit(1);
+});
