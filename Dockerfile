@@ -46,5 +46,5 @@ RUN npx playwright install chromium
 # Porta do servidor
 EXPOSE 3000
 
-# Comando para iniciar
+# Comando para inicia
 CMD ["node", "dist/index.js"]
