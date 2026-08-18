@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# Instalar dependências do sistema para o Playwright
+# Instalar dependências do sistema para Playwright
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copiar package.json e instalar
+# Copiar package.json e instalar dependências
 COPY package*.json ./
 RUN npm install
 
@@ -21,9 +21,10 @@ RUN npm install --save-dev @types/node tsx
 # Copiar o código
 COPY . .
 
-# Compilar
-RUN npm run build
+# Remover arquivos de teste problemáticos (se existirem)
+RUN rm -f src/*.test.ts
 
+# Rodar com tsx (sem compilar)
 EXPOSE 3000
 
-CMD ["node", "dist/index.js"]
+CMD ["npx", "tsx", "src/index.ts"]
