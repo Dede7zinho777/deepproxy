@@ -1,17 +1,15 @@
 {
   "name": "deepsproxy",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "Proxy inteligente para DeepSeek",
+  "type": "commonjs",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "npx tsx src/index.ts",
-    "login": "npx tsx src/login.ts",
-    "test": "tsx --test src/**/*.test.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "login:all": "tsx scripts/login-all.ts"
   },
-  "keywords": [],
-  "author": "Pedro Farias",
-  "license": "ISC",
   "dependencies": {
     "@hono/node-server": "^2.0.2",
     "dotenv": "^17.4.2",
@@ -25,5 +23,5 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   },
-  "type": "module"
+  "license": "ISC"
 }
