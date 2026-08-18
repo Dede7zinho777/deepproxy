@@ -1,26 +1,6 @@
-FROM node:20-slim AS builder
-
-WORKDIR /app
-
-# Copiar apenas os arquivos de dependência primeiro (cache)
-COPY package*.json ./
-COPY package-lock.json ./
-
-# Instalar dependências
-RUN npm install
-
-# Copiar o resto do código
-COPY . .
-
-# Compilar TypeScript
-RUN npm run build
-
-# ============================================
-# IMAGEM FINAL
-# ============================================
 FROM node:20-slim
 
-# Instalar dependências do Playwright (Chrome)
+# Instalar dependências do sistema para o Playwright
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -29,22 +9,21 @@ RUN apt-get update && apt-get install -y \
     && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Configurar Playwright
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-
 WORKDIR /app
 
-# Copiar node_modules e código compilado
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
+# Copiar package.json e instalar
+COPY package*.json ./
+RUN npm install
 
-# Instalar o Chromium do Playwright
-RUN npx playwright install chromium
+# Instalar dependências de desenvolvimento
+RUN npm install --save-dev @types/node tsx
 
-# Porta do servidor
+# Copiar o código
+COPY . .
+
+# Compilar
+RUN npm run build
+
 EXPOSE 3000
 
-# Comando para inicia
 CMD ["node", "dist/index.js"]
