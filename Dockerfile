@@ -1,12 +1,10 @@
 FROM node:20-slim
 
-# Instalar dependências do sistema para Playwright
+# Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt-get update && apt-get install -y google-chrome-stable \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -18,10 +16,21 @@ RUN npm install
 # Instalar dependências de desenvolvimento
 RUN npm install --save-dev @types/node tsx
 
-# Copiar o código
+# Copiar o resto do código
 COPY . .
 
-# Rodar com tsx (sem compilar)
+# Criar diretório dist (se não existir)
+RUN mkdir -p dist
+
+# Tentar compilar (se falhar, vai rodar com tsx mesmo assim)
+RUN npm run build || true
+
+# Configurar variáveis de ambiente
+ENV PORT=3000
+ENV NODE_ENV=production
+
+# Expor a porta
 EXPOSE 3000
 
+# Rodar o servidor
 CMD ["npx", "tsx", "src/index.ts"]
